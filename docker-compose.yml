@@ -13,7 +13,7 @@ services:
       - SECRET_KEY=your-secret-key-here
       - ALLOWED_HOSTS="marcia.coonect.tech,www.marcia.coonect.tech"
     networks:
-      - traefik_public
+      - coonectnet
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.marciachart.rule=Host(`marcia.coonect.tech`)"
@@ -32,10 +32,10 @@ services:
       - POSTGRES_USER=marciachart
       - POSTGRES_PASSWORD=marciachart
     networks:
-      - traefik_public
+      - coonectnet
 
 networks:
-  traefik_public:
+  coonectnet:
     external: true
 
 volumes:
