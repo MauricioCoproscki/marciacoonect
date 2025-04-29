@@ -1,40 +1,61 @@
 version: '3.8'
 
 services:
+
   web:
     image: marciachart:latest
     command: gunicorn marciachart.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - .:/app
+      - marciachart_data:/app
+    networks:
+      - coonectnet
     environment:
       - DEBUG=0
       - SECRET_KEY=django-insecure-0n6015=2g^q4r64tz*4gc%++&8&usqklo%5noleq
       - ALLOWED_HOSTS=marcia.coonect.tech,www.marcia.coonect.tech
-    networks:
-      - coonectnet
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.marciachart.rule=Host(`marcia.coonect.tech`)"
-      - "traefik.http.routers.marciachart.entrypoints=websecure"
-      - "traefik.http.routers.marciachart.tls=true"
-      - "traefik.http.services.marciachart.loadbalancer.server.port=8000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.marciachart.rule=Host(`marcia.coonect.tech`)
+        - traefik.http.services.marciachart.loadbalancer.server.port=8000
+        - traefik.http.routers.marciachart.service=marciachart
+        - traefik.http.routers.marciachart.entrypoints=websecure
+        - traefik.http.routers.marciachart.tls=true
+        - traefik.http.routers.marciachart.tls.certresolver=letsencryptresolver
     depends_on:
       - db
 
   db:
     image: postgres:13-alpine
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - marciachart_postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=marciachart
       - POSTGRES_USER=marciachart
       - POSTGRES_PASSWORD=marciachart
     networks:
       - coonectnet
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+
+volumes:
+  marciachart_data: {}
+  marciachart_postgres_data: {}
 
 networks:
   coonectnet:
     external: true
-
-volumes:
-  postgres_data: {}
+    name: coonectnet
