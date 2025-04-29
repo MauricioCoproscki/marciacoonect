@@ -1,12 +1,9 @@
 version: '3.8'
 
 services:
-
   web:
-    image: marciachart:latest
+    build: .
     command: gunicorn marciachart.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - marciachart_data:/app
     networks:
       - coonectnet
     environment:
@@ -19,17 +16,12 @@ services:
       placement:
         constraints:
           - node.role == manager
-      resources:
-        limits:
-          cpus: "1"
-          memory: 512M
       labels:
         - traefik.enable=true
         - traefik.http.routers.marciachart.rule=Host(`marcia.coonect.tech`)
-        - traefik.http.services.marciachart.loadbalancer.server.port=8000
-        - traefik.http.routers.marciachart.service=marciachart
         - traefik.http.routers.marciachart.entrypoints=websecure
         - traefik.http.routers.marciachart.tls=true
+        - traefik.http.services.marciachart.loadbalancer.server.port=8000
         - traefik.http.routers.marciachart.tls.certresolver=letsencryptresolver
     depends_on:
       - db
@@ -37,7 +29,7 @@ services:
   db:
     image: postgres:13-alpine
     volumes:
-      - marciachart_postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_DB=marciachart
       - POSTGRES_USER=marciachart
@@ -52,10 +44,8 @@ services:
           - node.role == manager
 
 volumes:
-  marciachart_data: {}
-  marciachart_postgres_data: {}
+  postgres_data: {}
 
 networks:
   coonectnet:
     external: true
-    name: coonectnet
