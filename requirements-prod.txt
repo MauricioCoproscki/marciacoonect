@@ -1,0 +1,9 @@
+Django==5.2
+djangorestframework==3.16.0
+python-dotenv==1.0.0
+requests==2.32.3
+gunicorn==21.2.0
+whitenoise==6.6.0
+psycopg2-binary==2.9.9  # Se for usar PostgreSQL
+python-decouple==3.8
+django-cors-headers==4.3.1 
