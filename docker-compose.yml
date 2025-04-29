@@ -10,7 +10,7 @@ services:
       - 8000
     environment:
       - DEBUG=0
-      - SECRET_KEY=your-secret-key-here
+      - SECRET_KEY=django-insecure-0n6015=2g^q4r64tz*4gc%++&8&usqklo%5noleq
       - ALLOWED_HOSTS="marcia.coonect.tech,www.marcia.coonect.tech"
     networks:
       - coonectnet
